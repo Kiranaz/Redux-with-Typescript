@@ -11,8 +11,8 @@ export const searchRepositories = (term: string) => {
         try {
             const { data } = await axios.get('https://registry.npmjs.org/-/v1/search', {
                 params: {
-                   text: term,
-               }
+                    text: term,
+                }
             })
             
             const names = data.objects.map((result: any) => {
@@ -23,11 +23,19 @@ export const searchRepositories = (term: string) => {
                 type: ActionTypes.SEARCH_REPO_SUCCESS,
                 payload: names
             })
-        } catch (err: any) {
-            dispatch({
-                type: ActionTypes.SEARCH_REPO_ERROR,
-                payload: err.message
-            })
+            console.log('cominginside1', names,!!names)
+            if (!!names && names.length === 0) {
+                throw new Error( (data && data.message) || data.status || 'No data found')
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('cominginside2')
+                console.log(error, 'error')
+                dispatch({
+                    type: ActionTypes.SEARCH_REPO_ERROR,
+                    payload: error.message //"useUnknownInCatchVariables": false, in tsconfig.json
+                })
+            }
         }
     }
 }
